@@ -33,8 +33,8 @@ class Agent:
     def _create_model(self):
         # create model
         model = Sequential()
-        model.add(Dense(5, input_shape=(self.state_size, ), activation='relu'))
-        model.add(Dense(5, activation='relu'))
+        model.add(Dense(25, input_shape=(self.state_size, ), activation='relu'))
+        model.add(Dense(25, activation='relu'))
         model.add(Dense(self.action_size, activation='linear'))
         model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate), metrics=['accuracy'])
         return model
