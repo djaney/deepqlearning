@@ -6,7 +6,7 @@ import numpy as np
 from Agent import Agent
 
 
-EPISODES = 1000
+EPISODES = 10000
 
 
 env = gym.make('CartPole-v1')
@@ -27,17 +27,16 @@ for e in range(EPISODES):
         agent.remember(state, action, reward, next_state, done)
         state = next_state
 
-        if time >= 500:
+        if time >= 499:
             optimized = True
             break
 
         if done:
             print("episode: {}/{}, score: {}, e: {:.2}".format(e, EPISODES, time, agent.epsilon))
             break
-
-        agent.train(batch_size)
     if optimized:
         break
+    agent.train(batch_size)
 
 
 state = np.reshape(env.reset(), [1, state_size])
