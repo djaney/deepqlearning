@@ -45,3 +45,5 @@ while True:
     action = agent.act(state)
     ob, reward, done, _ = env.step(action)
     state = np.reshape(ob, [1, state_size])
+    if done:
+        state = np.reshape(env.reset(), [1, state_size])
