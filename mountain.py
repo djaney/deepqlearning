@@ -37,7 +37,7 @@ for e in range(EPISODES):
             break
 
         if done:
-            print("episode: {}/{}, distance from goal: {}, e: {:.2}".format(e, EPISODES, abs(0.5-max_distance), agent.epsilon))
+            print("episode: {}/{}, distance from goal: {:.2}, e: {:.2}".format(e, EPISODES, abs(0.5-max_distance), agent.epsilon))
             break
     if optimized:
         break
