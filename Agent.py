@@ -8,27 +8,33 @@ import numpy as np
 
 class Agent:
 
-    def __init__(self, state_size, action_size):
+    def __init__(self,
+                 state_size,
+                 action_size,
+                 memory_size=2000,
+                 epsilon=0.7,
+                 gamma=0.9,
+                 epsilon_min=0.01,
+                 epsilon_decay=0.995,
+                 learning_rate=0.001):
+
         self.state_size = state_size
         self.action_size = action_size
-        self.done = False
-        self.episodes = 5000
-        self.sample_size = 32
-        self.session = deque(maxlen=2000)
+        self.session = deque(maxlen=memory_size)
 
-        self.epsilon = 0.7
-        self.gamma = 0.9
-        self.epsilon_min = 0.01
-        self.epsilon_decay = 0.995
-        self.learning_rate = 0.001
+        self.epsilon = epsilon
+        self.gamma = gamma
+        self.epsilon_min = epsilon_min
+        self.epsilon_decay = epsilon_decay
+        self.learning_rate = learning_rate
 
         self.model = self._create_model()
 
     def _create_model(self):
         # create model
         model = Sequential()
-        model.add(Dense(24, input_shape=(self.state_size, ), activation='relu'))
-        model.add(Dense(24, activation='relu'))
+        model.add(Dense(5, input_shape=(self.state_size, ), activation='relu'))
+        model.add(Dense(5, activation='relu'))
         model.add(Dense(self.action_size, activation='linear'))
         model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate), metrics=['accuracy'])
         return model
