@@ -31,15 +31,10 @@ class Agent:
         self.model = self._create_model()
 
     def _create_model(self):
-        # create model
-        model = Sequential()
-        model.add(Dense(25, input_shape=(self.state_size, ), activation='relu'))
-        model.add(Dense(25, activation='relu'))
-        model.add(Dense(self.action_size, activation='linear'))
-        model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate), metrics=['accuracy'])
-        return model
+        raise NotImplemented()
 
     def act(self, state):
+        state = self.format_state(state)
         if random.uniform(0, 1) <= self.epsilon:
             action = random.randrange(self.action_size)
         else:
@@ -47,7 +42,12 @@ class Agent:
         return action
 
     def remember(self, state, action, reward, next_state, done):
+        state = self.format_state(state)
+        next_state = self.format_state(next_state)
         self.session.append((state, action, reward, next_state, done))
+
+    def format_state(self, state):
+        raise NotImplemented()
 
     def train(self, sample_size):
         if len(self.session) <= sample_size:

@@ -3,8 +3,26 @@
 import gym
 import numpy as np
 
-from Agent import Agent
+from Agent import Agent as BaseAgent
 from collections import deque
+from keras.models import Sequential
+from keras.optimizers import Adam
+from keras.layers import Dense
+
+
+class Agent(BaseAgent):
+
+    def _create_model(self):
+        # create model
+        model = Sequential()
+        model.add(Dense(25, input_shape=(self.state_size, ), activation='relu'))
+        model.add(Dense(25, activation='relu'))
+        model.add(Dense(self.action_size, activation='linear'))
+        model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate), metrics=['accuracy'])
+        return model
+
+    def format_state(self, state):
+        return np.reshape(state, [1, self.state_size])
 
 
 env = gym.make('MountainCar-v0')
@@ -19,22 +37,21 @@ e = 0
 while True:
     e += 1
     optimized = False
-    state = np.reshape(env.reset(), [1, state_size])
+    ob = env.reset()
     max_distance = None
     for time in range(500):
         # env.render()
-        action = agent.act(state)
-        next_state, reward, done, _ = env.step(action)
-        next_state = np.reshape(next_state, [1, state_size])
-        agent.remember(state, action, reward, next_state, done)
-        state = next_state
+        action = agent.act(ob)
+        next_ob, reward, done, _ = env.step(action)
+        agent.remember(ob, action, reward, next_ob, done)
+        ob = next_ob
 
         if max_distance is None:
-            max_distance = state[0][0]
+            max_distance = ob[0]
         else:
-            max_distance = max(max_distance, state[0][0])
+            max_distance = max(max_distance, ob[0])
 
-        if state[0][0] >= 0.5:
+        if ob[0] >= 0.5:
             optimized = True
             break
 
@@ -43,8 +60,9 @@ while True:
                 success_stream.append(100)
             else:
                 success_stream.append(0)
-            print("episode: {}, distance from goal: {:.2}, e: {:.2} success rate: {:.2}"
-                  .format(e, abs(0.5-max_distance), agent.epsilon, np.average(success_stream)))
+            goal_percent = (max_distance+1.2) / (0.6+1.2) * 100
+            print("episode: {}, goal: {:.2f}%, e: {:.2f} success rate: {:.2f}"
+                  .format(e, goal_percent, agent.epsilon, np.average(success_stream)))
             break
 
     agent.train(batch_size)
@@ -54,11 +72,10 @@ while True:
         break
 
 
-state = np.reshape(env.reset(), [1, state_size])
+ob = env.reset()
 while True:
     env.render()
-    action = agent.act(state)
+    action = agent.act(ob)
     ob, reward, done, _ = env.step(action)
-    state = np.reshape(ob, [1, state_size])
     if done:
-        state = np.reshape(env.reset(), [1, state_size])
+        ob = env.reset()

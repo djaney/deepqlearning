@@ -3,7 +3,25 @@
 import gym
 import numpy as np
 
-from Agent import Agent
+from Agent import Agent as BaseAgent
+from keras.models import Sequential
+from keras.optimizers import Adam
+from keras.layers import Dense
+
+
+class Agent(BaseAgent):
+
+    def _create_model(self):
+        # create model
+        model = Sequential()
+        model.add(Dense(25, input_shape=(self.state_size, ), activation='relu'))
+        model.add(Dense(25, activation='relu'))
+        model.add(Dense(self.action_size, activation='linear'))
+        model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate), metrics=['accuracy'])
+        return model
+
+    def format_state(self, state):
+        return np.reshape(state, [1, self.state_size])
 
 
 EPISODES = 10000
