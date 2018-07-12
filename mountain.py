@@ -43,6 +43,9 @@ while True:
         # env.render()
         action = agent.act(ob)
         next_ob, reward, done, _ = env.step(action)
+
+        reward = -10 if done and ob[0] < 0.5 else reward
+
         agent.remember(ob, action, reward, next_ob, done)
         ob = next_ob
 
