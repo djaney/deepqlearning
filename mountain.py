@@ -7,7 +7,6 @@ from Agent import Agent
 from collections import deque
 
 
-
 env = gym.make('MountainCar-v0')
 state_size = env.observation_space.shape[0]
 action_size = env.action_space.n
@@ -15,7 +14,7 @@ batch_size = 32
 agent = Agent(state_size, action_size)
 
 
-success_stream = deque(maxlen=10)
+success_stream = deque(maxlen=3)
 e = 0
 while True:
     e += 1
