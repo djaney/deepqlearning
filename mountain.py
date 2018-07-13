@@ -28,9 +28,11 @@ env = gym.make('MountainCar-v0')
 state_size = env.observation_space.shape[0]
 action_size = env.action_space.n
 batch_size = 32
+checkpoint = 500
 agent = Agent(state_size, action_size, memory_size=10000, epsilon_decay=0.999)
 
 e = 0
+c = 0
 while True:
     e += 1
     optimized = False
@@ -54,12 +56,16 @@ while True:
         agent.remember(ob, action, reward, next_ob, done)
         ob = next_ob
 
+        if c >= checkpoint:
+            c = 0
+            agent.train(batch_size)
+
+        c += 1
+
         if done:
             print("episode: {}, reward: {:.2f}, e: {:.2f}"
                   .format(e, max_true_reward, agent.epsilon))
             break
-
-    agent.train(batch_size)
 
 ob = env.reset()
 while True:
