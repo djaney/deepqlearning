@@ -29,7 +29,7 @@ state_size = env.observation_space.shape[0]
 action_size = env.action_space.n
 batch_size = 32
 checkpoint = 500
-agent = Agent(state_size, action_size, memory_size=10000, epsilon_decay=0.999)
+agent = Agent(state_size, action_size, memory_size=10000, epsilon_decay=0.95)
 
 e = 0
 c = 0
@@ -41,18 +41,18 @@ while True:
     total_reward = 0
     max_true_reward = 0
     for time in range(500):
-        if e % 100 == 0:
+        if e % 500 == 0:
             env.render()
         action = agent.act(ob)
         next_ob, reward, done, _ = env.step(action)
 
         total_reward += reward
         if done:
-            reward = 210 + total_reward
+            reward = 200 + total_reward
         else:
             reward = abs(next_ob[0] - ob[0])
 
-        max_true_reward += reward
+        max_true_reward = max(max_true_reward, reward)
 
         agent.remember(ob, action, reward, next_ob, done)
         ob = next_ob
