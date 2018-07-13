@@ -41,7 +41,8 @@ while True:
     total_reward = 0
     max_true_reward = 0
     for time in range(500):
-        # env.render()
+        if e % 100 == 0:
+            env.render()
         action = agent.act(ob)
         next_ob, reward, done, _ = env.step(action)
 
@@ -67,10 +68,3 @@ while True:
                   .format(e, max_true_reward, agent.epsilon))
             break
 
-ob = env.reset()
-while True:
-    env.render()
-    action = agent.act(ob)
-    ob, reward, done, _ = env.step(action)
-    if done:
-        ob = env.reset()

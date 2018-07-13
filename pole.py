@@ -24,8 +24,6 @@ class Agent(BaseAgent):
         return np.reshape(state, [1, self.state_size])
 
 
-EPISODES = 10000
-
 
 env = gym.make('CartPole-v1')
 state_size = env.observation_space.shape[0]
@@ -34,10 +32,13 @@ batch_size = 32
 agent = Agent(state_size, action_size)
 
 optimized = False
-for e in range(EPISODES):
+e = 0
+while True:
+    e += 1
     state = np.reshape(env.reset(), [1, state_size])
     for time in range(500):
-        # env.render()
+        if e % 100 == 0:
+            env.render()
         action = agent.act(state)
         next_state, reward, done, _ = env.step(action)
         reward = reward if not done else -10
@@ -50,7 +51,7 @@ for e in range(EPISODES):
             break
 
         if done:
-            print("episode: {}/{}, score: {}, e: {:.2f}".format(e, EPISODES, time, agent.epsilon))
+            print("episode: {}, score: {}, e: {:.2f}".format(e, time, agent.epsilon))
             break
     if optimized:
         break
