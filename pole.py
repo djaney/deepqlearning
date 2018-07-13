@@ -50,7 +50,7 @@ for e in range(EPISODES):
             break
 
         if done:
-            print("episode: {}/{}, score: {}, e: {:.2}".format(e, EPISODES, time, agent.epsilon))
+            print("episode: {}/{}, score: {}, e: {:.2f}".format(e, EPISODES, time, agent.epsilon))
             break
     if optimized:
         break

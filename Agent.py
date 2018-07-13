@@ -9,7 +9,7 @@ class Agent:
                  state_size,
                  action_size,
                  memory_size=2000,
-                 epsilon=0.7,
+                 epsilon=1,
                  gamma=0.9,
                  epsilon_min=0.01,
                  epsilon_decay=0.995,
