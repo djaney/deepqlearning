@@ -32,7 +32,6 @@ batch_size = 32
 agent = Agent(state_size, action_size, memory_size=10000, epsilon_decay=0.95, model_path='./.models/breakout-ram.h5')
 
 e = 0
-counter = 0
 while True:
     e += 1
     optimized = False
@@ -50,17 +49,14 @@ while True:
 
         agent.remember(ob, action, reward, next_ob, done)
         ob = next_ob
-        counter += 1
-        if counter > 500:
+
+        if done:
             sys.stdout.write("episode: {}, reward: {:.2f}, e: {:.2f}..."
                              .format(e, total_reward, agent.epsilon))
             sys.stdout.flush()
             agent.train(batch_size)
             sys.stdout.write("OK\n")
             sys.stdout.flush()
-            counter = 0
-
-        if done:
             break
 
     if e % 10 == 0:
