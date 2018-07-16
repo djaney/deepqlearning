@@ -1,2 +1,4 @@
 .idea
 venv
+.models/*
+!.models/.gitkeep

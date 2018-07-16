@@ -29,16 +29,17 @@ env = gym.make('Breakout-ram-v0')
 state_size = env.observation_space.shape[0]
 action_size = env.action_space.n
 batch_size = 32
-agent = Agent(state_size, action_size, memory_size=10000, epsilon_decay=0.95)
+agent = Agent(state_size, action_size, memory_size=10000, epsilon_decay=0.95, model_path='./.models/breakout-ram.h5')
 
 e = 0
+counter = 0
 while True:
     e += 1
     optimized = False
     ob = env.reset()
     max_distance = None
     total_reward = 0
-    for time in range(500):
+    while True:
         env.render()
         action = agent.act(ob)
         next_ob, reward, done, _ = env.step(action)
@@ -47,13 +48,19 @@ while True:
 
         agent.remember(ob, action, reward, next_ob, done)
         ob = next_ob
-
-        if done:
+        counter += 1
+        if counter > 500:
             sys.stdout.write("episode: {}, reward: {:.2f}, e: {:.2f}..."
                              .format(e, total_reward, agent.epsilon))
             sys.stdout.flush()
             agent.train(batch_size)
             sys.stdout.write("OK\n")
             sys.stdout.flush()
+            counter = 0
 
+        if done:
             break
+
+    if e % 10 == 0:
+        agent.save('./.models/breakout-ram.h5')
+        print('saved...')

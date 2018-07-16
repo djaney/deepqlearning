@@ -1,6 +1,8 @@
 import random
 from collections import deque
 import numpy as np
+import os
+from keras.models import load_model
 
 
 class Agent:
@@ -13,7 +15,8 @@ class Agent:
                  gamma=0.9,
                  epsilon_min=0.01,
                  epsilon_decay=0.995,
-                 learning_rate=0.001):
+                 learning_rate=0.001,
+                 model_path=None):
 
         self.state_size = state_size
         self.action_size = action_size
@@ -25,7 +28,10 @@ class Agent:
         self.epsilon_decay = epsilon_decay
         self.learning_rate = learning_rate
 
-        self.model = self._create_model()
+        if model_path is not None and os.path.isfile(model_path) and os.access(model_path, os.R_OK):
+            self.model = load_model(model_path)
+        else:
+            self.model = self._create_model()
 
     def _create_model(self):
         raise NotImplemented()
@@ -70,8 +76,5 @@ class Agent:
             self.epsilon *= self.epsilon_decay
         return True
 
-    def load(self, name):
-        self.model.load_weights(name)
-
     def save(self, name):
-        self.model.save_weights(name)
+        self.model.save(name)
