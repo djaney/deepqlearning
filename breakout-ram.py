@@ -36,11 +36,13 @@ counter = 0
 while True:
     e += 1
     optimized = False
+
     ob = env.reset()
     max_distance = None
     total_reward = 0
     while True:
-        env.render()
+        if not (len(sys.argv) > 1 and sys.argv[1] == 'fast'):
+            env.render()
         action = agent.act(ob)
         next_ob, reward, done, _ = env.step(action)
 
