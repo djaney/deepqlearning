@@ -64,5 +64,6 @@ while True:
             break
 
     if e % 10 == 0:
+        sys.stdout.write("saving...")
         agent.save('./.models/breakout-ram.h5')
-        print('saved...')
+        sys.stdout.write("OK\n")
