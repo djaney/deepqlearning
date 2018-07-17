@@ -17,7 +17,8 @@ class Agent(BaseAgent):
         # create model
         model = Sequential()
         model.add(Dense(512, input_shape=(self.state_size,), activation='relu'))
-        model.add(Dense(512, activation='relu'))
+        model.add(Dense(256, activation='relu'))
+        model.add(Dense(128, activation='relu'))
         model.add(Dense(self.action_size, activation='linear'))
         model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate), metrics=['accuracy'])
         return model
