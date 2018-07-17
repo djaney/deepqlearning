@@ -27,11 +27,11 @@ class Agent:
         self.epsilon_min = epsilon_min
         self.epsilon_decay = epsilon_decay
         self.learning_rate = learning_rate
+        self.model = self._create_model()
 
         if model_path is not None and os.path.isfile(model_path) and os.access(model_path, os.R_OK):
-            self.model = load_model(model_path)
-        else:
-            self.model = self._create_model()
+            self.model.load_weights(model_path)
+
 
     def _create_model(self):
         raise NotImplemented()
@@ -77,4 +77,4 @@ class Agent:
         return True
 
     def save(self, name):
-        self.model.save(name)
+        self.model.save_weights(name)

@@ -16,10 +16,11 @@ class Agent(BaseAgent):
     def _create_model(self):
         # create model
         model = Sequential()
-        model.add(Dense(512, input_shape=(self.state_size,), activation='relu'))
-        model.add(Dense(256, activation='relu'))
-        model.add(Dense(128, activation='relu'))
-        model.add(Dense(self.action_size, activation='linear'))
+        model.add(Dense(512, input_shape=(self.state_size,), activation='relu', kernel_initializer='zero',
+                        bias_initializer='zero'))
+        model.add(Dense(256, activation='relu', kernel_initializer='zero', bias_initializer='zero'))
+        model.add(Dense(128, activation='relu', kernel_initializer='zero', bias_initializer='zero'))
+        model.add(Dense(self.action_size, activation='linear', kernel_initializer='zero', bias_initializer='zero'))
         model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate), metrics=['accuracy'])
         return model
 
@@ -29,7 +30,7 @@ class Agent(BaseAgent):
 
 env = gym.make('Breakout-ram-v0')
 state_size = env.observation_space.shape[0]
-action_size = env.action_space.n - 2
+action_size = env.action_space.n
 batch_size = 32
 
 real_mode = len(sys.argv) > 1 and sys.argv[1] == 'real'
@@ -55,16 +56,7 @@ while True:
         if not fast_mode:
             env.render()
         action = agent.act(ob)
-        env.step(1)  # auto press 1 to auto launch ball
-        next_ob, reward, done, info = env.step(action + 2)  # use only 2,3 for left and right
-
-        reward += 1  # just to avoid negatives
-
-        if life is None:
-            life = info.get('ale.lives')
-        elif life != info.get('ale.lives'):
-            reward = 0  # lose reward for losing life
-            life = info.get('ale.lives')
+        next_ob, reward, done, info = env.step(action)
 
         total_reward += reward
 
