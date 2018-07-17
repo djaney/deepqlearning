@@ -64,7 +64,7 @@ while True:
         agent.remember(ob, action, reward, next_ob, done)
         ob = next_ob
 
-        if done or t > 500 or info.get('ale.lives') > 5:
+        if done or t > 500 or info.get('ale.lives') != 5:
             sys.stdout.write("episode: {}, reward: {:.2f}, e: {:.2f} , t: {}..."
                              .format(e, total_reward, agent.epsilon, t))
             sys.stdout.flush()
