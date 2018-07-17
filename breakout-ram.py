@@ -33,7 +33,7 @@ action_size = env.action_space.n - 2
 batch_size = 32
 
 real_mode = len(sys.argv) > 1 and sys.argv[1] == 'real'
-
+fast_mode = len(sys.argv) > 1 and sys.argv[1] == 'fast'
 if real_mode:
     agent = Agent(state_size, action_size, epsilon=-1.0, model_path='./.models/breakout-ram.h5')
 else:
@@ -52,7 +52,7 @@ while True:
     t = 0
 
     while True:
-        if not (len(sys.argv) > 1 and sys.argv[1] == 'fast'):
+        if not fast_mode:
             env.render()
         action = agent.act(ob)
         env.step(1)  # auto press 1 to auto launch ball
