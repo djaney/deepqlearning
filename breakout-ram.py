@@ -31,7 +31,11 @@ env = gym.make('Breakout-ram-v0')
 state_size = env.observation_space.shape[0]
 action_size = env.action_space.n
 batch_size = 32
-agent = Agent(state_size, action_size, memory_size=10000, epsilon_decay=0.95, model_path='./.models/breakout-ram.h5')
+if len(sys.argv) > 1 and sys.argv[1] == 'real':
+    agent = Agent(state_size, action_size, memory_size=10000, epsilon_decay=1, epsilon=0.01, epsilon_min=0.01,
+                  model_path='./.models/breakout-ram.h5')
+else:
+    agent = Agent(state_size, action_size, memory_size=10000, epsilon_decay=0.95, model_path='./.models/breakout-ram.h5')
 
 e = 0
 while True:
