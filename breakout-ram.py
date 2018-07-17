@@ -41,25 +41,40 @@ while True:
     ob = env.reset()
     max_distance = None
     total_reward = 0
+    life = None
+    t = 0
     while True:
         if not (len(sys.argv) > 1 and sys.argv[1] == 'fast'):
             env.render()
         action = agent.act(ob)
-        next_ob, reward, done, _ = env.step(action)
+        next_ob, reward, done, info = env.step(action)
+
+        reward += 1  # just to avoid negatives
+
+        if life is None:
+            life = info.get('ale.lives')
+        elif life != info.get('ale.lives'):
+            reward = 0  # lose reward for losing life
+            life = info.get('ale.lives')
 
         total_reward += reward
 
         agent.remember(ob, action, reward, next_ob, done)
         ob = next_ob
 
-        if done:
-            sys.stdout.write("episode: {}, reward: {:.2f}, e: {:.2f}..."
-                             .format(e, total_reward, agent.epsilon))
+        if done or t > 500:
+            sys.stdout.write("episode: {}, reward: {:.2f}, e: {:.2f} , t: {}..."
+                             .format(e, total_reward, agent.epsilon, t))
             sys.stdout.flush()
             agent.train(batch_size)
             sys.stdout.write("OK\n")
             sys.stdout.flush()
+            t = 0
+
+        if done:
             break
+
+        t += 1
 
         if len(sys.argv) > 1 and sys.argv[1] == 'real':
             sleep(1/30)
