@@ -91,7 +91,7 @@ while True:
         if real_mode:
             sleep(1/60)
 
-    if e % 10 == 0:
+    if e % 10 == 0 and not real_mode:
         sys.stdout.write("saving...")
         agent.save('./.models/breakout-ram.h5')
         sys.stdout.write("OK\n")
