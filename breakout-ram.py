@@ -16,11 +16,10 @@ class Agent(BaseAgent):
     def _create_model(self):
         # create model
         model = Sequential()
-        model.add(Dense(512, input_shape=(self.state_size,), activation='relu', kernel_initializer='zero',
-                        bias_initializer='zero'))
-        model.add(Dense(256, activation='relu', kernel_initializer='zero', bias_initializer='zero'))
-        model.add(Dense(128, activation='relu', kernel_initializer='zero', bias_initializer='zero'))
-        model.add(Dense(self.action_size, activation='linear', kernel_initializer='zero', bias_initializer='zero'))
+        model.add(Dense(512, input_shape=(self.state_size,), activation='relu'))
+        model.add(Dense(256, activation='relu'))
+        model.add(Dense(128, activation='relu'))
+        model.add(Dense(self.action_size, activation='linear'))
         model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate), metrics=['accuracy'])
         return model
 
