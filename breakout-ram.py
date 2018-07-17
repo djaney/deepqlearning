@@ -3,6 +3,7 @@
 import gym
 import numpy as np
 import sys
+from time import sleep
 
 from Agent import Agent as BaseAgent
 from keras.models import Sequential
@@ -58,6 +59,9 @@ while True:
             sys.stdout.write("OK\n")
             sys.stdout.flush()
             break
+
+        if len(sys.argv) > 1 and sys.argv[1] == 'real':
+            sleep(1/30)
 
     if e % 10 == 0:
         sys.stdout.write("saving...")
