@@ -29,13 +29,16 @@ class Agent(BaseAgent):
 
 env = gym.make('Breakout-ram-v0')
 state_size = env.observation_space.shape[0]
-action_size = env.action_space.n
+action_size = env.action_space.n - 2
 batch_size = 32
-if len(sys.argv) > 1 and sys.argv[1] == 'real':
-    agent = Agent(state_size, action_size, memory_size=10000, epsilon_decay=1, epsilon=-0.0, epsilon_min=-0.0,
-                  model_path='./.models/breakout-ram.h5')
+
+real_mode = len(sys.argv) > 1 and sys.argv[1] == 'real'
+
+if real_mode:
+    agent = Agent(state_size, action_size, epsilon=-1.0, model_path='./.models/breakout-ram.h5')
 else:
-    agent = Agent(state_size, action_size, memory_size=10000, epsilon_decay=0.95, model_path='./.models/breakout-ram.h5')
+    agent = Agent(state_size, action_size,
+                  memory_size=10000, epsilon_decay=0.95, model_path='./.models/breakout-ram.h5')
 
 e = 0
 while True:
@@ -47,11 +50,13 @@ while True:
     total_reward = 0
     life = None
     t = 0
+
     while True:
         if not (len(sys.argv) > 1 and sys.argv[1] == 'fast'):
             env.render()
         action = agent.act(ob)
-        next_ob, reward, done, info = env.step(action)
+        env.step(1)  # auto press 1 to auto launch ball
+        next_ob, reward, done, info = env.step(action + 2)  # use only 2,3 for left and right
 
         reward += 1  # just to avoid negatives
 
@@ -70,7 +75,10 @@ while True:
             sys.stdout.write("episode: {}, reward: {:.2f}, e: {:.2f} , t: {}..."
                              .format(e, total_reward, agent.epsilon, t))
             sys.stdout.flush()
-            agent.train(batch_size)
+
+            if not real_mode:
+                agent.train(batch_size)
+
             sys.stdout.write("OK\n")
             sys.stdout.flush()
             t = 0
@@ -80,7 +88,7 @@ while True:
 
         t += 1
 
-        if len(sys.argv) > 1 and sys.argv[1] == 'real':
+        if real_mode:
             sleep(1/60)
 
     if e % 10 == 0:
