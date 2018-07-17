@@ -51,19 +51,20 @@ while True:
     total_reward = 0
     life = None
     t = 0
-
+    env.step(1)
     while True:
         if not fast_mode:
             env.render()
         action = agent.act(ob)
         next_ob, reward, done, info = env.step(action)
-
+        if info.get('ale.lives') != 5:
+            reward = 0
         total_reward += reward
 
         agent.remember(ob, action, reward, next_ob, done)
         ob = next_ob
 
-        if done or t > 500:
+        if done or t > 500 or info.get('ale.lives') > 5:
             sys.stdout.write("episode: {}, reward: {:.2f}, e: {:.2f} , t: {}..."
                              .format(e, total_reward, agent.epsilon, t))
             sys.stdout.flush()
@@ -75,7 +76,7 @@ while True:
             sys.stdout.flush()
             t = 0
 
-        if done:
+        if done or info.get('ale.lives') != 5:
             break
 
         t += 1
