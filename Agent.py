@@ -32,7 +32,6 @@ class Agent:
         if model_path is not None and os.path.isfile(model_path) and os.access(model_path, os.R_OK):
             self.model.load_weights(model_path)
 
-
     def _create_model(self):
         raise NotImplemented()
 
@@ -41,7 +40,7 @@ class Agent:
         if random.uniform(0, 1) <= self.epsilon:
             action = random.randrange(self.action_size)
         else:
-            action = np.argmax(self.model.predict(state)[0])
+            action = np.argmax(self.model.predict(np.expand_dims(state, 0))[0])
         return action
 
     def remember(self, state, action, reward, next_state, done):
@@ -52,25 +51,28 @@ class Agent:
     def format_state(self, state):
         raise NotImplemented()
 
-    def train(self, sample_size):
+    def train(self, sample_size, verbose=0):
         if len(self.session) <= sample_size:
             return False
 
         samples = random.sample(self.session, sample_size)
-
+        x = []
+        y = []
         for state, action, reward, state_, done in samples:
 
             if done:
                 q = reward
             else:
-                q = (reward + self.gamma * np.max(self.model.predict(state_)[0]))
+                q = (reward + self.gamma * np.max(self.model.predict(np.expand_dims(state_, 0))[0]))
 
             # get current q value
-            target = self.model.predict(state)
+            target = self.model.predict(np.expand_dims(state_, 0))[0]
             # update q value
-            target[0][action] = q
+            target[action] = q
             # save new q value
-            self.model.fit(state, target, epochs=1, verbose=0)
+            x.append(state)
+            y.append(target)
+        self.model.fit(np.array(x), np.array(y), epochs=1, verbose=verbose)
 
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay
