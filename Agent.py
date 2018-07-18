@@ -74,9 +74,7 @@ class Agent:
                 q = (reward + self.gamma * np.max(self.model.predict(np.expand_dims(state_, 0))[0]))
 
             # get current q value
-            # target = self.model.predict(np.expand_dims(state_, 0))[0]
-            # other actions are zero
-            target = np.zeros((self.action_size,))
+            target = self.model.predict(np.expand_dims(state_, 0))[0]
             # update q value
             target[action] = q
             # save new q value
