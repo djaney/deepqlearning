@@ -52,7 +52,7 @@ else:
 e = 0
 frames = 0
 while True:
-    e += 1
+
     optimized = False
 
     ob = env.reset()
@@ -72,7 +72,7 @@ while True:
         ob = next_ob
 
         if frames > target_frame and not real_mode:
-            sys.stdout.write("episode: {}, reward: {:.2f}, e: {:.2f}"
+            sys.stdout.write("episode: {}, reward: {:.2f}, e: {:.4f}..."
                              .format(e, total_reward, agent.epsilon))
             sys.stdout.flush()
 
@@ -85,7 +85,7 @@ while True:
             sys.stdout.write("saving...")
             agent.save('./.models/breakout-ram.h5')
             sys.stdout.write("OK\n")
-
+            e += 1
             frames = 0
 
         if done:
