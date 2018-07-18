@@ -33,7 +33,7 @@ env = gym.make('Breakout-v0')
 state_size = env.observation_space.shape[0]
 action_size = env.action_space.n
 batch_size = 32
-target_frame = 500  # 40000
+target_frame = 40000
 max_frames = 80000000
 
 real_mode = len(sys.argv) > 1 and sys.argv[1] == 'real'
