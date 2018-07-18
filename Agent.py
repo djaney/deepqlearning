@@ -28,6 +28,8 @@ class Agent:
         self.epsilon_decay = epsilon_decay
         self.learning_rate = learning_rate
         self.model = self._create_model()
+        self.reward_running_avg = deque(maxlen=memory_size)
+        self.training_sessions = 0
 
         if model_path is not None and os.path.isfile(model_path) and os.access(model_path, os.R_OK):
             self.model.load_weights(model_path)
@@ -46,6 +48,7 @@ class Agent:
     def remember(self, state, action, reward, next_state, done):
         state = self.format_state(state)
         next_state = self.format_state(next_state)
+        self.reward_running_avg.append(reward)
         self.session.append((state, action, reward, next_state, done))
 
     def format_state(self, state):
@@ -76,7 +79,13 @@ class Agent:
 
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay
+
+        self.training_sessions += 1
+
         return True
 
     def save(self, name):
         self.model.save_weights(name)
+
+    def get_average_reward(self):
+        return np.average(self.reward_running_avg)
