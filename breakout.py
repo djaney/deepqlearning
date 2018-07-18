@@ -8,7 +8,7 @@ import imageprocessing as im
 from Agent import Agent as BaseAgent
 from keras.models import Sequential
 from keras.optimizers import Adam
-from keras.layers import Dense, Conv2D, Flatten
+from keras.layers import Dense, Conv2D, Flatten, Lambda
 
 
 class Agent(BaseAgent):
@@ -16,10 +16,17 @@ class Agent(BaseAgent):
     def _create_model(self):
         # create model
         model = Sequential()
-        model.add(Conv2D(16, 8, input_shape=(105, 80, 1, ), activation='relu'))
+        # normalize input
+        model.add(Lambda(lambda x: x / 255.0, input_shape=(105, 80, 1, )))
+        # first layer
+        model.add(Conv2D(16, 8, activation='relu'))
+        # second layer
         model.add(Conv2D(32, 4, activation='relu'))
-        model.add(Dense(256, activation='linear'))
+        # flattened
         model.add(Flatten())
+        # first hidden
+        model.add(Dense(256, activation='linear'))
+        # second hidden
         model.add(Dense(self.action_size, activation='linear'))
         model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate), metrics=['accuracy'])
         return model
@@ -33,18 +40,17 @@ env = gym.make('Breakout-v0')
 state_size = env.observation_space.shape[0]
 action_size = env.action_space.n
 batch_size = 32
-target_frame = 40000
+target_frame = 500# 40000
 max_frames = 80000000
 
 real_mode = len(sys.argv) > 1 and sys.argv[1] == 'real'
 fast_mode = len(sys.argv) > 1 and sys.argv[1] == 'fast'
 if real_mode:
-    agent = Agent(state_size, action_size, epsilon=-1.0, model_path='./.models/breakout.h5')
+    agent = Agent(state_size, action_size, model_path='./.models/breakout.h5')
 else:
     agent = Agent(state_size, action_size,
                   memory_size=max_frames,
-                  epsilon_decay=0.5,
-                  epsilon_min=0.005,
+                  epsilon_decay_policy=[1.0, 0.1],
                   model_path='./.models/breakout.h5',
                   gamma=0.99,
                   learning_rate=0.0001)
