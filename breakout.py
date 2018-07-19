@@ -13,11 +13,13 @@ from keras.layers import Dense, Conv2D, Flatten, Lambda
 
 class Agent(BaseAgent):
 
+    n_frame_history = 4
+
     def _create_model(self):
         # create model
         model = Sequential()
         # normalize input
-        model.add(Lambda(lambda x: x / 255.0, input_shape=(105, 80, 1, )))
+        model.add(Lambda(lambda x: x / 255.0, input_shape=(105, 80, self.n_frame_history, )))
         # first layer
         model.add(Conv2D(16, 8, activation='relu'))
         # second layer
@@ -32,7 +34,10 @@ class Agent(BaseAgent):
         return model
 
     def format_state(self, state):
-        state = np.reshape(im.preprocess(state), (105, 80, 1))
+        # downsample each frame
+        down_sample = np.array([im.preprocess(frame) for frame in state])
+        state = np.stack(down_sample, axis=2)
+
         return state
 
 
@@ -42,6 +47,8 @@ action_size = env.action_space.n
 batch_size = 32
 target_frame = 500# 40000
 max_frames = 80000000
+n_frame_history = 4
+frame_history = []
 
 real_mode = len(sys.argv) > 1 and sys.argv[1] == 'real'
 fast_mode = len(sys.argv) > 1 and sys.argv[1] == 'fast'
@@ -63,6 +70,9 @@ while True:
     optimized = False
 
     ob = env.reset()
+    # copy screens 4 times
+    frame_history = 4 * [ob]
+
     max_distance = None
     total_reward = 0
     life = None
@@ -71,12 +81,14 @@ while True:
     while True:
         if not fast_mode:
             env.render()
-        action = agent.act(ob)
+        action = agent.act(frame_history)
         next_ob, reward, done, info = env.step(action)
+        next_frame_history = frame_history[1:]  # push and pop history
+        next_frame_history.append(next_ob)
         total_reward += reward
 
-        agent.remember(ob, action, reward, next_ob, done)
-        ob = next_ob
+        agent.remember(frame_history, action, reward, next_frame_history, done)
+        frame_history = next_frame_history
 
         if frames > target_frame and not real_mode:
             sys.stdout.write("episode: {}, average reward: {:.10f}, e: {:.4f}..."
