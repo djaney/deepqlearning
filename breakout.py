@@ -47,6 +47,7 @@ action_size = env.action_space.n
 batch_size = 32
 target_frame = 1000
 max_frames = 100000
+prefill_size = 20000
 n_frame_history = 4
 frame_history = []
 
@@ -59,6 +60,7 @@ if real_mode:
 else:
     agent = Agent(state_size, action_size,
                   memory_size=max_frames,
+                  prefill_size=prefill_size,
                   epsilon_decay_policy=[1.0, 0.1],
                   model_path='./.models/breakout.h5',
                   gamma=0.99,
@@ -105,7 +107,8 @@ while True:
             sys.stdout.flush()
 
             if not real_mode:
-                agent.train(batch_size)
+                if not agent.train(batch_size):
+                    print("waiting for prefill")
 
             sys.stdout.write("OK\n")
             sys.stdout.flush()

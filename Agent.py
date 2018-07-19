@@ -11,6 +11,7 @@ class Agent:
                  state_size,
                  action_size,
                  memory_size=2000,
+                 prefill_size=1000,
                  gamma=0.9,
                  epsilon_min=0.01,
                  learning_rate=0.001,
@@ -19,6 +20,7 @@ class Agent:
 
         self.state_size = state_size
         self.action_size = action_size
+        self.prefill_size = prefill_size
         self.session = deque(maxlen=memory_size)
 
         self.gamma = gamma
@@ -58,7 +60,7 @@ class Agent:
         raise NotImplemented()
 
     def train(self, sample_size, verbose=0):
-        if len(self.session) <= sample_size:
+        if len(self.session) <= self.prefill_size:
             return False
 
         self.training_sessions += 1
@@ -86,8 +88,6 @@ class Agent:
             self.epsilon = self.epsilon_decay_policy[-1]
         else:
             self.epsilon = self.epsilon_decay_policy[self.training_sessions]
-
-
 
         return True
 
