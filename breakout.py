@@ -97,8 +97,10 @@ while True:
         agent.remember(frame_history, action, reward, next_frame_history, done)
         frame_history = next_frame_history
 
+        sys.stdout.write(u"\u001b[1000DPlaying...{:.2f}%".format(frames/target_frame*100))
+        sys.stdout.flush()
         if frames > target_frame and not real_mode:
-            sys.stdout.write("episode: {}, average reward: {:.10f}, e: {:.4f}..."
+            sys.stdout.write("\nepisode: {}, average reward: {:.10f}, e: {:.4f}..."
                              .format(agent.training_sessions, agent.get_average_reward(), agent.epsilon))
             sys.stdout.flush()
 
