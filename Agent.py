@@ -27,7 +27,7 @@ class Agent:
         self.epsilon_min = epsilon_min
         self.learning_rate = learning_rate
         self.model = self._create_model()
-        self.reward_running_avg = deque(maxlen=memory_size)
+        self.reward_running_avg = deque(maxlen=100)
         self.training_sessions = 0
         self.epsilon_decay_policy = epsilon_decay_policy
 
