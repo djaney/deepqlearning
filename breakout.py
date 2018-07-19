@@ -75,7 +75,7 @@ while True:
 
     max_distance = None
     total_reward = 0
-    life = None
+    lives = 5
 
     env.step(1)
     while True:
@@ -86,6 +86,11 @@ while True:
         next_frame_history = frame_history[1:]  # push and pop history
         next_frame_history.append(next_ob)
         total_reward += reward
+
+        # subtract score if you lose a life
+        if lives != info.get('ale.lives'):
+            lives = info.get('ale.lives')
+            reward -= 1
 
         agent.remember(frame_history, action, reward, next_frame_history, done)
         frame_history = next_frame_history
