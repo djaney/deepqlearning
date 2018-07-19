@@ -45,8 +45,8 @@ env = gym.make('Breakout-v0')
 state_size = env.observation_space.shape[0]
 action_size = env.action_space.n
 batch_size = 32
-target_frame = 1000
-max_frames = 50000
+target_frame = 10000
+max_frames = 80000
 prefill_size = 20000
 n_frame_history = 4
 frame_history = []
@@ -101,8 +101,9 @@ while True:
 
 
         if frames > target_frame and not real_mode:
-            sys.stdout.write(u"\u001b[1000Depisode: {}, average reward: {:.5f}, e: {:.1f}, m: {}..."
-                             .format(agent.training_sessions, agent.get_average_reward(), agent.epsilon, len(agent.session)))
+            sys.stdout.write(u"\u001b[1000Depisode: {}, average reward: {:.5f}, e: {:.1f}, m: {:.1f}%..."
+                             .format(agent.training_sessions, agent.get_average_reward(),
+                                     agent.epsilon, len(agent.session)/max_frames*100))
             sys.stdout.flush()
 
             if not real_mode:
