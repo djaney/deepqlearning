@@ -101,7 +101,7 @@ while True:
 
 
         if frames > target_frame and not real_mode:
-            sys.stdout.write("\nepisode: {}, average reward: {:.5f}, e: {:.1f}, m: {}..."
+            sys.stdout.write(u"\u001b[1000Depisode: {}, average reward: {:.5f}, e: {:.1f}, m: {}..."
                              .format(agent.training_sessions, agent.get_average_reward(), agent.epsilon, len(agent.session)))
             sys.stdout.flush()
 
