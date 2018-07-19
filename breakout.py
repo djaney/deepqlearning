@@ -46,7 +46,7 @@ state_size = env.observation_space.shape[0]
 action_size = env.action_space.n
 batch_size = 32
 target_frame = 1000
-max_frames = 2000000
+max_frames = 100000
 n_frame_history = 4
 frame_history = []
 
