@@ -53,7 +53,9 @@ frame_history = []
 real_mode = len(sys.argv) > 1 and sys.argv[1] == 'real'
 fast_mode = len(sys.argv) > 1 and sys.argv[1] == 'fast'
 if real_mode:
-    agent = Agent(state_size, action_size, model_path='./.models/breakout.h5')
+    agent = Agent(state_size, action_size,
+                  epsilon_decay_policy=[0.1],
+                  model_path='./.models/breakout.h5',)
 else:
     agent = Agent(state_size, action_size,
                   memory_size=max_frames,
