@@ -99,24 +99,25 @@ while True:
         agent.remember(frame_history, action, reward, next_frame_history, done)
         frame_history = next_frame_history
 
-        sys.stdout.write(u"\u001b[1000DPlaying...{:.2f}%".format(frames/target_frame*100))
-        sys.stdout.flush()
+
         if frames > target_frame and not real_mode:
-            sys.stdout.write("\nepisode: {}, average reward: {:.10f}, e: {:.4f}..."
-                             .format(agent.training_sessions, agent.get_average_reward(), agent.epsilon))
+            sys.stdout.write("\nepisode: {}, average reward: {:.5f}, e: {:.1f}, m: {}..."
+                             .format(agent.training_sessions, agent.get_average_reward(), agent.epsilon, len(agent.session)))
             sys.stdout.flush()
 
             if not real_mode:
-                if not agent.train(batch_size):
-                    print("waiting for prefill")
-
-            sys.stdout.write("OK\n")
+                if agent.train(batch_size):
+                    sys.stdout.write("saving...")
+                    agent.save('./.models/breakout.h5')
+                    sys.stdout.write("OK\n")
+                else:
+                    sys.stdout.write("waiting for prefill\n")
+                sys.stdout.flush()
+            frames = 0
+        else:
+            sys.stdout.write(u"\u001b[1000DPlaying...{:.2f}%".format(frames / target_frame * 100))
             sys.stdout.flush()
 
-            sys.stdout.write("saving...")
-            agent.save('./.models/breakout.h5')
-            sys.stdout.write("OK\n")
-            frames = 0
 
         if done:
             break
