@@ -7,7 +7,7 @@ from time import sleep
 import imageprocessing as im
 from Agent import Agent as BaseAgent
 from keras.models import Sequential
-from keras.optimizers import Adam
+from keras.optimizers import RMSprop
 from keras.layers import Dense, Conv2D, Flatten, Lambda
 
 
@@ -29,7 +29,8 @@ class Agent(BaseAgent):
         model.add(Dense(256, activation='linear'))
         # second hidden
         model.add(Dense(self.action_size, activation='linear'))
-        model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate), metrics=['accuracy'])
+        optimizer = RMSprop(lr=self.learning_rate, rho=0.95, epsilon=0.01)
+        model.compile(loss='mse', optimizer=optimizer, metrics=['accuracy'])
         return model
 
     def format_state(self, state):
