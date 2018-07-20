@@ -12,14 +12,13 @@ from keras.layers import Dense, Conv2D, Flatten, Lambda
 
 
 class Agent(BaseAgent):
-
     n_frame_history = 4
 
     def _create_model(self):
         # create model
         model = Sequential()
         # normalize input
-        model.add(Lambda(lambda x: x / 255.0, input_shape=(105, 80, self.n_frame_history, )))
+        model.add(Lambda(lambda x: x / 255.0, input_shape=(105, 80, self.n_frame_history,)))
         # first layer
         model.add(Conv2D(16, 8, activation='relu'))
         # second layer
@@ -56,7 +55,7 @@ fast_mode = len(sys.argv) > 1 and sys.argv[1] == 'fast'
 if real_mode:
     agent = Agent(state_size, action_size,
                   epsilon_decay_policy=[0.1],
-                  model_path='./.models/breakout.h5',)
+                  model_path='./.models/breakout.h5', )
 else:
     agent = Agent(state_size, action_size,
                   memory_size=max_frames,
@@ -99,11 +98,10 @@ while True:
         agent.remember(frame_history, action, reward, next_frame_history, done)
         frame_history = next_frame_history
 
-
         if frames > target_frame and not real_mode:
             sys.stdout.write(u"\u001b[1000Depisode: {}, average reward: {:.5f}, e: {:.1f}, m: {:.1f}%..."
                              .format(agent.training_sessions, agent.get_average_reward(),
-                                     agent.epsilon, len(agent.session)/max_frames*100))
+                                     agent.epsilon, len(agent.session) / max_frames * 100))
             sys.stdout.flush()
 
             if not real_mode:
@@ -115,10 +113,9 @@ while True:
                     sys.stdout.write("waiting for prefill\n")
                 sys.stdout.flush()
             frames = 0
-        else:
+        elif not real_mode:
             sys.stdout.write(u"\u001b[1000DPlaying...{:.2f}%".format(frames / target_frame * 100))
             sys.stdout.flush()
-
 
         if done:
             break
@@ -126,4 +123,4 @@ while True:
         frames += 1
 
         if real_mode:
-            sleep(1/60)
+            sleep(1 / 100)
