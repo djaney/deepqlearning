@@ -39,7 +39,7 @@ train_mode = len(sys.argv) > 1 and sys.argv[1] == 'train'
 
 # Finally, we configure and compile our agent. You can use every built-in Keras optimizer and
 # even the metrics!
-memory = SequentialMemory(limit=50000, window_length=1)
+memory = SequentialMemory(limit=20000, window_length=1)
 policy = BoltzmannQPolicy()
 dqn = DQNAgent(model=model, nb_actions=nb_actions, memory=memory, nb_steps_warmup=10,
                target_model_update=1e-2, policy=policy, enable_dueling_network=True, dueling_type='avg',)
@@ -50,7 +50,7 @@ if os.path.isfile(WEIGHTS_PATH) and os.access(WEIGHTS_PATH, os.R_OK):
 
 if train_mode:
 
-    dqn.fit(env, nb_steps=999999999, visualize=False, verbose=2)
+    dqn.fit(env, nb_steps=50000, visualize=False, verbose=2)
     dqn.save_weights(WEIGHTS_PATH, overwrite=True)
     print('save')
 
