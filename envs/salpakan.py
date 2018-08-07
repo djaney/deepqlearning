@@ -1,5 +1,7 @@
 from gym import Env, spaces
 import numpy as np
+from .salpakan_game import SalpakanGame
+
 
 class SalpakanEnv(Env):
 
