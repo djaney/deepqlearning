@@ -5,8 +5,8 @@ def to_grayscale(img):
     return np.mean(img, axis=2).astype(np.uint8)
 
 
-def downsample(img):
-    return img[::2, ::2]
+def downsample(img, factor=2):
+    return img[::factor, ::factor]
 
 
 def preprocess(img):

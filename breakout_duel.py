@@ -18,6 +18,8 @@ ENV_NAME = 'Breakout-v0'
 WEIGHTS_PATH = '.models/dqn_{}_weights.h5f'.format(ENV_NAME)
 INPUT_SHAPE = (105, 80)
 WINDOW_LENGTH = 4
+MEMORY = 20000
+WARM_UP = 1000
 
 
 class AtariProcessor(Processor):
@@ -63,10 +65,10 @@ train_mode = len(sys.argv) > 1 and sys.argv[1] == 'train'
 
 # Finally, we configure and compile our agent. You can use every built-in Keras optimizer and
 # even the metrics!
-memory = SequentialMemory(limit=20000, window_length=WINDOW_LENGTH)
+memory = SequentialMemory(limit=MEMORY, window_length=WINDOW_LENGTH)
 policy = BoltzmannQPolicy()
 processor = AtariProcessor()
-dqn = DQNAgent(model=model, nb_actions=nb_actions, memory=memory, nb_steps_warmup=10,
+dqn = DQNAgent(model=model, nb_actions=nb_actions, memory=memory, nb_steps_warmup=WARM_UP,
                target_model_update=1e-2, policy=policy, enable_dueling_network=True,
                dueling_type='avg', processor=processor)
 dqn.compile(Adam(lr=1e-3), metrics=['mae'])
