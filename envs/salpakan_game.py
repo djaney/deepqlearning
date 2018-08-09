@@ -107,7 +107,7 @@ class SalpakanGame:
             square_id, x, y, _x, _y, direction = _parse_move(move)
 
             if not self._is_valid_move(player, (x, y), (_x, _y)):
-                return # ignore move if invalid TODO need to handle invalid random actions
+                return 0  # ignore move if invalid TODO need to handle invalid random actions
 
             move_type = self._get_move_type(player, (x, y), (_x, _y))
 
