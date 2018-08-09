@@ -21,7 +21,7 @@ class SalpakanProcessor(Processor):
     def process_state_batch(self, batch):
         mask = np.zeros((289))
         mask = [1 if (self.env.game.is_valid_move(i)) else 0 for i in mask]
-        return [batch, np.expand_dims(mask, 0)]
+        return [batch, np.stack([mask] * batch.shape[0])]
 
 
 ENV_NAME = 'Salpakan-v0'
@@ -75,7 +75,7 @@ if os.path.isfile(WEIGHTS_PATH) and os.access(WEIGHTS_PATH, os.R_OK):
 
 if train_mode:
 
-    dqn.fit(env, nb_steps=50000, visualize=False, verbose=2)
+    dqn.fit(env, nb_steps=50000, visualize=True, verbose=2)
     dqn.save_weights(WEIGHTS_PATH, overwrite=True)
     print('save')
 
