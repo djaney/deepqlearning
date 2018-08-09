@@ -49,11 +49,10 @@ def _parse_move(move):
 
 
 def _normalize_board(player, board):
-    # TODO bug onlt returning 1 channel
+    n_board = np.copy(board)
     if player < 0:
-        return board[:, :, CHANNEL_TROOPS] * -1
-    else:
-        return board[:, :, CHANNEL_TROOPS] * 1
+        n_board[:, :, CHANNEL_TROOPS] = n_board[:, :, CHANNEL_TROOPS] * -1
+    return n_board
 
 
 class SalpakanGame:
@@ -180,3 +179,7 @@ class SalpakanGame:
             return MOVE_CAPTURE
         else:
             return MOVE_NORMAL
+
+    def is_valid_move(self, move):
+        square_id, x, y, _x, _y, direction = _parse_move(move)
+        return self._is_valid_move(self.turn, (x, y), (_x, _y))

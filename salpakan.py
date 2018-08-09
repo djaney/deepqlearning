@@ -3,20 +3,30 @@ import numpy as np
 import gym
 import sys
 import os
-from keras.models import Sequential
-from keras.layers import Dense, Activation, Flatten, Conv2D, Permute
+from keras.models import Model
+from keras.layers import Dense, Flatten, Conv2D, Reshape, multiply, Input
 from keras.optimizers import Adam
 
 from rl.agents.dqn import DQNAgent
 from rl.policy import BoltzmannQPolicy
 from rl.memory import SequentialMemory
 from rl.core import Processor
-import imageprocessing as im
 import envs
+
+
+class SalpakanProcessor(Processor):
+    def __init__(self, env):
+        self.env = env
+
+    def process_state_batch(self, batch):
+        mask = np.ones((289))
+        mask = [1 if (self.env.game.is_valid_move(i)) else 0 for i in mask]
+        return [batch, np.expand_dims(mask, 0)]
+
 
 ENV_NAME = 'Salpakan-v0'
 WEIGHTS_PATH = '.models/dqn_{}_weights.h5f'.format(ENV_NAME)
-WINDOW_LENGTH = 4
+WINDOW_LENGTH = 1
 MEMORY = 20000
 WARM_UP = 1000
 
@@ -29,14 +39,20 @@ env.seed(123)
 nb_actions = env.action_space.n
 
 # Next, we build a very simple model.
-input_shape = env.observation_space.shape
-model = Sequential()
-model.add(Conv2D(32, 4, activation='relu', input_shape=input_shape))
-model.add(Conv2D(64, 2, activation='relu'))
-model.add(Flatten())
-model.add(Dense(512))
-model.add(Activation('relu'))
-model.add(Dense(nb_actions, activation='relu'))
+input_shape =(WINDOW_LENGTH, ) + env.observation_space.shape
+input_layer = Input(shape=input_shape)
+mask = Input(shape=(nb_actions,))
+
+rehsape_layer = Reshape((9, 8, 3))(input_layer)
+conv_1 = Conv2D(32, 4, activation='relu')(rehsape_layer)
+conv_2 = Conv2D(192, 2, activation='relu')(conv_1)
+flat_layer = Flatten()(conv_2)
+dense_1 = Dense(512, activation='relu')(flat_layer)
+output_layer = Dense(nb_actions)(dense_1)
+masked_layer = multiply([output_layer, mask])
+
+
+model = Model([input_layer, mask],masked_layer)
 model.summary()
 
 
@@ -47,10 +63,11 @@ train_mode = len(sys.argv) > 1 and sys.argv[1] == 'train'
 # even the metrics!
 memory = SequentialMemory(limit=MEMORY, window_length=WINDOW_LENGTH)
 policy = BoltzmannQPolicy()
+processor = SalpakanProcessor(env)
 
 dqn = DQNAgent(model=model, nb_actions=nb_actions, memory=memory, nb_steps_warmup=WARM_UP,
                target_model_update=1e-2, policy=policy, enable_dueling_network=True,
-               dueling_type='avg')
+               dueling_type='avg', processor=processor)
 dqn.compile(Adam(lr=1e-3), metrics=['mae'])
 
 if os.path.isfile(WEIGHTS_PATH) and os.access(WEIGHTS_PATH, os.R_OK):
