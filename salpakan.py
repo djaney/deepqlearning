@@ -19,7 +19,7 @@ class SalpakanProcessor(Processor):
         self.env = env
 
     def process_state_batch(self, batch):
-        mask = np.ones((289))
+        mask = np.zeros((289))
         mask = [1 if (self.env.game.is_valid_move(i)) else 0 for i in mask]
         return [batch, np.expand_dims(mask, 0)]
 

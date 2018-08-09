@@ -23,7 +23,7 @@ class SalpakanEnv(Env):
         return self._get_state()
 
     def render(self, mode='human'):
-        pass
+        print('hehe')
 
     def close(self):
         super().close()
