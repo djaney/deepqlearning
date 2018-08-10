@@ -11,6 +11,7 @@ MOVE_NORMAL = 0
 MOVE_CAPTURE = 1
 MOVE_WIN = 10
 MOVE_PASS = 0
+MOVE_INVALID = -1
 
 CHANNEL_TROOPS = 0
 CHANNEL_PERCEPTION = 1
@@ -107,7 +108,7 @@ class SalpakanGame:
             square_id, x, y, _x, _y, direction = _parse_move(move)
 
             if not self._is_valid_move(player, (x, y), (_x, _y)):
-                return 0  # ignore move if invalid TODO need to handle invalid random actions
+                return MOVE_INVALID
 
             move_type = self._get_move_type(player, (x, y), (_x, _y))
 
@@ -136,10 +137,12 @@ class SalpakanGame:
                     self.board[_x][_y][CHANNEL_PERCEPTION] = max(self.board[x][y][CHANNEL_TROOPS]+1,
                                                                  self.board[_x][_y][CHANNEL_PERCEPTION])
                     self.board[x][y] = self.board[x][y] * 0
+                    move_type *=- 1
                 else:
                     self.board[_x][_y][CHANNEL_PERCEPTION] = self.board[x][y][CHANNEL_TROOPS]
                     self.board[x][y] = self.board[x][y] * 0
                     self.board[_x][_y] = self.board[_x][_y] * 0
+                    move_type = MOVE_NORMAL
             elif move_type == MOVE_WIN:
                 self.board[_x][_y] = self.board[x][y]
                 self.board[x][y] = self.board[x][y] * 0

@@ -66,7 +66,7 @@ policy = BoltzmannQPolicy()
 processor = SalpakanProcessor(env)
 
 dqn = DQNAgent(model=model, nb_actions=nb_actions, memory=memory, nb_steps_warmup=WARM_UP,
-               target_model_update=1e-2, policy=policy, enable_dueling_network=True,
+               target_model_update=1e-2, policy=policy, enable_dueling_network=False,
                dueling_type='avg', processor=processor)
 dqn.compile(Adam(lr=1e-3), metrics=['mae'])
 
