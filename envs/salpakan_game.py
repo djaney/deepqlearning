@@ -113,9 +113,7 @@ class SalpakanGame:
             move_type = self._get_move_type(player, (x, y), (_x, _y))
 
             if move_type == MOVE_NORMAL:
-                tmp = self.board[x][y]
-                self.board[x][y] = self.board[_x][_y]
-                self.board[_x][_y] = tmp
+                self.board[x][y], self.board[_x][_y] = np.copy(self.board[_x][_y]), np.copy(self.board[x][y])
             elif move_type == MOVE_CAPTURE:
                 normalized_board = _normalize_board(player, self.board)
                 me = normalized_board[x][y][CHANNEL_TROOPS]
@@ -137,7 +135,7 @@ class SalpakanGame:
                     self.board[_x][_y][CHANNEL_PERCEPTION] = max(self.board[x][y][CHANNEL_TROOPS]+1,
                                                                  self.board[_x][_y][CHANNEL_PERCEPTION])
                     self.board[x][y] = self.board[x][y] * 0
-                    move_type *=- 1
+                    move_type *= -1
                 else:
                     self.board[_x][_y][CHANNEL_PERCEPTION] = self.board[x][y][CHANNEL_TROOPS]
                     self.board[x][y] = self.board[x][y] * 0
@@ -160,7 +158,17 @@ class SalpakanGame:
         return _normalize_board(self.turn, self.board)
 
     def _is_valid_move(self, player, src, destination):
+
         board = _normalize_board(player, self.board)
+
+        if src[0] >= board.shape[0] or src[0] < 0:
+            return False
+        if destination[0] >= board.shape[0] or destination[0] < 0:
+            return False
+        if src[1] >= board.shape[1] or src[1] < 0:
+            return False
+        if destination[1] >= board.shape[1] or destination[1] < 0:
+            return False
 
         # check if moving own piece
         if board[src[0]][src[1]][CHANNEL_TROOPS] <= 0:

@@ -27,8 +27,9 @@ class SalpakanProcessor(Processor):
 ENV_NAME = 'Salpakan-v0'
 WEIGHTS_PATH = '.models/dqn_{}_weights.h5f'.format(ENV_NAME)
 WINDOW_LENGTH = 1
-MEMORY = 20000
-WARM_UP = 1000
+NB_STEPS = 5000
+MEMORY = 2000
+WARM_UP = 100
 
 
 
@@ -66,8 +67,7 @@ policy = BoltzmannQPolicy()
 processor = SalpakanProcessor(env)
 
 dqn = DQNAgent(model=model, nb_actions=nb_actions, memory=memory, nb_steps_warmup=WARM_UP,
-               target_model_update=1e-2, policy=policy, enable_dueling_network=False,
-               dueling_type='avg', processor=processor)
+               target_model_update=1e-2, policy=policy, processor=processor)
 dqn.compile(Adam(lr=1e-3), metrics=['mae'])
 
 if os.path.isfile(WEIGHTS_PATH) and os.access(WEIGHTS_PATH, os.R_OK):
@@ -75,7 +75,7 @@ if os.path.isfile(WEIGHTS_PATH) and os.access(WEIGHTS_PATH, os.R_OK):
 
 if train_mode:
 
-    dqn.fit(env, nb_steps=50000, visualize=True, verbose=2)
+    dqn.fit(env, nb_steps=NB_STEPS, visualize=True, verbose=2)
     dqn.save_weights(WEIGHTS_PATH, overwrite=True)
     print('save')
 
