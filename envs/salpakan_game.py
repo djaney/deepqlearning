@@ -9,6 +9,7 @@ SPECIAL_MOVES_N = 1
 
 MOVE_NORMAL = 0
 MOVE_CAPTURE = 1
+MOVE_CAPTURE_LOSE = -1
 MOVE_WIN = 10
 MOVE_PASS = 0
 MOVE_INVALID = -1
@@ -51,7 +52,7 @@ def _parse_move(move):
 
 def _normalize_board(player, board):
     n_board = np.copy(board)
-    if player < 0:
+    if player == 1:
         n_board[:, :, CHANNEL_TROOPS] = n_board[:, :, CHANNEL_TROOPS] * -1
     return n_board
 
@@ -126,7 +127,7 @@ class SalpakanGame:
                 elif me == TROOP_PRIVATE and him == -TROOP_SPY:  # private captures spy
                     win = 1
                 else:  # normal rank based clash
-                    win = 1 if me > him else -1
+                    win = 1 if me > -him else -1
 
                 if win > 0:  # win
                     self.board[_x][_y] = self.board[x][y]
@@ -135,7 +136,7 @@ class SalpakanGame:
                     self.board[_x][_y][CHANNEL_PERCEPTION] = max(self.board[x][y][CHANNEL_TROOPS]+1,
                                                                  self.board[_x][_y][CHANNEL_PERCEPTION])
                     self.board[x][y] = self.board[x][y] * 0
-                    move_type *= -1
+                    move_type = MOVE_CAPTURE_LOSE
                 else:
                     self.board[_x][_y][CHANNEL_PERCEPTION] = self.board[x][y][CHANNEL_TROOPS]
                     self.board[x][y] = self.board[x][y] * 0
@@ -195,3 +196,7 @@ class SalpakanGame:
     def is_valid_move(self, move):
         square_id, x, y, _x, _y, direction = _parse_move(move)
         return self._is_valid_move(self.turn, (x, y), (_x, _y))
+
+    def generate_mask(self):
+        mask = [1 if (self.is_valid_move(i)) else 0 for i in range(289)]
+        return np.array(mask)

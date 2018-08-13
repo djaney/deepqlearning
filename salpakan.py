@@ -19,19 +19,15 @@ class SalpakanProcessor(Processor):
         self.env = env
 
     def process_state_batch(self, batch):
-        mask = np.zeros((289))
-        mask = [1 if (self.env.game.is_valid_move(i)) else 0 for i in mask]
-        return [batch, np.stack([mask] * batch.shape[0])]
+        return [batch, np.stack([self.env.game.generate_mask()] * batch.shape[0])]
 
 
 ENV_NAME = 'Salpakan-v0'
 WEIGHTS_PATH = '.models/dqn_{}_weights.h5f'.format(ENV_NAME)
 WINDOW_LENGTH = 1
-NB_STEPS = 5000
-MEMORY = 2000
+NB_STEPS = 50000
+MEMORY = 20000
 WARM_UP = 100
-
-
 
 # Get the environment and extract the number of actions.
 env = gym.make(ENV_NAME)
@@ -40,7 +36,7 @@ env.seed(123)
 nb_actions = env.action_space.n
 
 # Next, we build a very simple model.
-input_shape =(WINDOW_LENGTH, ) + env.observation_space.shape
+input_shape = (WINDOW_LENGTH,) + env.observation_space.shape
 input_layer = Input(shape=input_shape)
 mask = Input(shape=(nb_actions,))
 
@@ -52,13 +48,10 @@ dense_1 = Dense(512, activation='relu')(flat_layer)
 output_layer = Dense(nb_actions)(dense_1)
 masked_layer = multiply([output_layer, mask])
 
-
-model = Model([input_layer, mask],masked_layer)
+model = Model([input_layer, mask], masked_layer)
 model.summary()
 
-
 train_mode = len(sys.argv) > 1 and sys.argv[1] == 'train'
-
 
 # Finally, we configure and compile our agent. You can use every built-in Keras optimizer and
 # even the metrics!
