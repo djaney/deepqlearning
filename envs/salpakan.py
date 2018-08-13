@@ -1,10 +1,9 @@
 from gym import Env, spaces
 import numpy as np
 from .salpakan_game import SalpakanGame, Renderer
-import tkinter as tk
 
 OBSERVATION_SHAPE = (9, 8, 3)
-MAX_STEPS = 200
+MAX_STEPS = 1000
 
 
 class SalpakanEnv(Env):

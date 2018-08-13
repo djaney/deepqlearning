@@ -92,9 +92,6 @@ class SalpakanGame:
                     if self.board[x][y][CHANNEL_TROOPS] == 0:
                         # set troops, negative if player 2
                         self.board[x][y][CHANNEL_TROOPS] = i + 1 if player == PLAYER_1 else (i + 1) * -1
-                        # set spy flag
-                        if self.board[x][y][CHANNEL_TROOPS] == TROOP_SPY:
-                            self.board[x][y][CHANNEL_SPY_PERCEPTION] = 1
                         break
 
     def move(self, move):
@@ -123,10 +120,14 @@ class SalpakanGame:
 
                 if me == him:  # cancel out
                     win = 0
+                    if me == TROOP_SPY:
+                        self.board[x][y][CHANNEL_SPY_PERCEPTION] = 1
                 elif me == TROOP_SPY and him != -TROOP_PRIVATE:  # spy captures
                     win = 1
                 elif me == TROOP_PRIVATE and him == -TROOP_SPY:  # private captures spy
                     win = 1
+                    if me == TROOP_FIVE_STAR:
+                        self.board[x][y][CHANNEL_SPY_PERCEPTION] = 1
                 else:  # normal rank based clash
                     win = 1 if me > -him else -1
 
@@ -134,9 +135,10 @@ class SalpakanGame:
                     self.board[_x][_y] = self.board[x][y]
                     self.board[x][y] = self.board[x][y] * 0
                 elif win < 0:  # lose
-                    self.board[_x][_y][CHANNEL_PERCEPTION] = max(self.board[x][y][CHANNEL_TROOPS]+1,
+                    self.board[_x][_y][CHANNEL_PERCEPTION] = max(self.board[x][y][CHANNEL_TROOPS] + 1,
                                                                  self.board[_x][_y][CHANNEL_PERCEPTION])
                     self.board[x][y] = self.board[x][y] * 0
+
                     move_type = MOVE_CAPTURE_LOSE
                 else:
                     self.board[_x][_y][CHANNEL_PERCEPTION] = self.board[x][y][CHANNEL_TROOPS]
@@ -205,7 +207,7 @@ class SalpakanGame:
 
 class Renderer:
     def __init__(self):
-        self.width = 562
+        self.width = 532
         self.height = 500
 
         self.x_tiles = 9
@@ -217,34 +219,53 @@ class Renderer:
         self.view = None
         self.canvas = None
 
+        window_width = self.width * 2
+        window_height = self.height * 2
+
         self.view = tk.Tk()
-        self.view.geometry('{}x{}'.format(self.width, self.height))
+        self.view.geometry('{}x{}'.format(window_width, window_height))
         self.view.resizable(width=False, height=False)
-        self.canvas = tk.Canvas(self.view, width=self.width, height=self.width)
-        self.canvas.pack()
+
+        self.canvas = self._create_canvas(self.view, (0, 0))
+        self.canvas2 = self._create_canvas(self.view, (0, 1))
+        self.canvas3 = self._create_canvas(self.view, (1, 0))
 
     def render(self, game):
+
         self._clear(self.canvas)
+        self._clear(self.canvas2)
+        self._clear(self.canvas3)
+
         self._draw_board(self.canvas)
-        self._draw_pieces(game.board)
+        self._draw_pieces(self.canvas, game.board)
+
+        self._draw_board(self.canvas2)
+        self._draw_perception(self.canvas2, game.board)
+
+        self._draw_board(self.canvas3)
+        self._draw_spy_perception(self.canvas3, game.board)
+
         self.view.update_idletasks()
 
-    def _clear(self, canvas):
+    def _create_canvas(self, parent, grid):
+        canvas = tk.Canvas(parent, width=self.width, height=self.height, bg='white')
+        canvas.grid(row=grid[0], column=grid[1])
+        return canvas
+
+    @staticmethod
+    def _clear(canvas):
 
         # clear
         canvas.delete("all")
+
     def _draw_board(self, canvas):
-
-        # set board to white
-        canvas.create_rectangle(0, 0, self.width, self.height, fill='white')
-
         # add lines
         for i in range(self.x_tiles):
             canvas.create_line(self.tile_width * i, 0, self.tile_width * i, self.height)
         for i in range(self.y_tiles):
             canvas.create_line(0, self.tile_height * i, self.width, self.tile_height * i)
 
-    def _draw_pieces(self, board):
+    def _draw_pieces(self, canvas, board):
         # Draw cells
         for x, col in enumerate(board):
             for y, cell in enumerate(col):
@@ -253,9 +274,37 @@ class Renderer:
                 x2 = self.tile_width * x + self.tile_width
                 y2 = self.tile_height * y + self.tile_height
                 # Draw pieces
-                if cell[0] != 0:
-                    self.canvas.create_rectangle(x1, y1, x2, y2, fill='red' if cell[0] > 0 else 'black')
-                    self.canvas.create_text(x1 + (x2 - x1) / 2, y1 + (y2 - y1) / 2,
-                                            fill='white',
-                                            font="Times 20 bold",
-                                            text=str(cell[0]))
+                if cell[CHANNEL_TROOPS] != 0:
+                    canvas.create_rectangle(x1, y1, x2, y2, fill='red' if cell[CHANNEL_TROOPS] > 0 else 'black')
+                    canvas.create_text(x1 + (x2 - x1) / 2, y1 + (y2 - y1) / 2,
+                                       fill='white',
+                                       font="Arial 20 bold",
+                                       text=str(int(cell[0])))
+
+    def _draw_perception(self, canvas, board):
+        # Draw cells
+        for x, col in enumerate(board):
+            for y, cell in enumerate(col):
+                x1 = self.tile_width * x
+                y1 = self.tile_height * y
+                x2 = self.tile_width * x + self.tile_width
+                y2 = self.tile_height * y + self.tile_height
+
+                value = (cell[CHANNEL_PERCEPTION] / 16) if cell[CHANNEL_PERCEPTION] > 0 else 0
+                value = 255 - math.floor(value * 255)
+                hex_value = value.to_bytes(1, 'big').hex()
+                canvas.create_rectangle(x1, y1, x2, y2, fill='#{0}{0}{0}'.format(hex_value))
+
+    def _draw_spy_perception(self, canvas, board):
+        # Draw cells
+        for x, col in enumerate(board):
+            for y, cell in enumerate(col):
+                x1 = self.tile_width * x
+                y1 = self.tile_height * y
+                x2 = self.tile_width * x + self.tile_width
+                y2 = self.tile_height * y + self.tile_height
+
+                value = (cell[CHANNEL_SPY_PERCEPTION] / 1) if cell[CHANNEL_SPY_PERCEPTION] > 0 else 0
+                value = 255 - math.floor(value * 255)
+                hex_value = value.to_bytes(1, 'big').hex()
+                canvas.create_rectangle(x1, y1, x2, y2, fill='#{0}{0}{0}'.format(hex_value))
