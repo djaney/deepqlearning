@@ -135,7 +135,7 @@ class SalpakanGame:
                     self.board[_x][_y] = self.board[x][y]
                     self.board[x][y] = self.board[x][y] * 0
                 elif win < 0:  # lose
-                    self.board[_x][_y][CHANNEL_PERCEPTION] = max(self.board[x][y][CHANNEL_TROOPS] + 1,
+                    self.board[_x][_y][CHANNEL_PERCEPTION] = max(abs(self.board[x][y][CHANNEL_TROOPS]) + 1,
                                                                  self.board[_x][_y][CHANNEL_PERCEPTION])
                     self.board[x][y] = self.board[x][y] * 0
 
