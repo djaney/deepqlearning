@@ -2,10 +2,10 @@ from gym import Env, spaces
 import numpy as np
 from .salpakan_game import SalpakanGame
 import tkinter as tk
-import time
 
 OBSERVATION_SHAPE = (9, 8, 3)
 MAX_STEPS = 200
+
 
 class SalpakanEnv(Env):
 
