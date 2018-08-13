@@ -26,6 +26,7 @@ class SalpakanEnv(Env):
         return ob, reward, done, {}
 
     def reset(self):
+        self.steps = 0
         self.game = SalpakanGame()
         return self._get_state()
 
