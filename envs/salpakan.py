@@ -5,7 +5,7 @@ import tkinter as tk
 import time
 
 OBSERVATION_SHAPE = (9, 8, 3)
-
+MAX_STEPS = 200
 
 class SalpakanEnv(Env):
 
@@ -16,11 +16,13 @@ class SalpakanEnv(Env):
         self.game = None
         self.view = None
         self.canvas = None
+        self.steps = 0
 
     def step(self, action):
         reward = self.game.move(action)
         ob = self._get_state()
-        done = self.game.winner is not None
+        done = self.game.winner is not None or self.steps >= MAX_STEPS
+        self.steps += 1
         return ob, reward, done, {}
 
     def reset(self):
