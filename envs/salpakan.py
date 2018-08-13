@@ -1,6 +1,6 @@
 from gym import Env, spaces
 import numpy as np
-from .salpakan_game import SalpakanGame
+from .salpakan_game import SalpakanGame, Renderer
 import tkinter as tk
 
 OBSERVATION_SHAPE = (9, 8, 3)
@@ -17,6 +17,7 @@ class SalpakanEnv(Env):
         self.view = None
         self.canvas = None
         self.steps = 0
+        self.renderer = Renderer()
 
     def step(self, action):
         reward = self.game.move(action)
@@ -31,51 +32,7 @@ class SalpakanEnv(Env):
         return self._get_state()
 
     def render(self, mode='human'):
-
-        width = 562
-        height = 500
-
-        x_tiles = 9
-        y_tiles = 8
-
-        tile_width = width / x_tiles
-        tile_height = height / y_tiles
-
-        if self.view is None:
-            self.view = tk.Tk()
-            self.view.geometry('{}x{}'.format(width, height))
-            self.view.resizable(width=False, height=False)
-            self.canvas = tk.Canvas(self.view, width=width, height=height)
-            self.canvas.pack()
-
-        # clear
-        self.canvas.delete("all")
-
-        # set board to white
-        self.canvas.create_rectangle(0, 0, width, height, fill='white')
-
-        # add lines
-        for i in range(x_tiles):
-            self.canvas.create_line(tile_width * i, 0, tile_width * i, height)
-        for i in range(y_tiles):
-            self.canvas.create_line(0, tile_height * i, width, tile_height * i)
-
-        # Draw cells
-        for x, col in enumerate(self.game.board):
-            for y, cell in enumerate(col):
-                x1 = tile_width * x
-                y1 = tile_height * y
-                x2 = tile_width * x + tile_width
-                y2 = tile_height * y + tile_height
-                # Draw pieces
-                if cell[0] != 0:
-                    self.canvas.create_rectangle(x1, y1, x2, y2, fill='red' if cell[0] > 0 else 'black')
-                    self.canvas.create_text(x1 + (x2 - x1) / 2, y1 + (y2 - y1) / 2,
-                                            fill='white',
-                                            font="Times 20 bold",
-                                            text=str(cell[0]))
-        self.view.update_idletasks()
-        # time.sleep(1)
+        self.renderer.render(self.game)
 
     def close(self):
         super().close()

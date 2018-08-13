@@ -25,7 +25,7 @@ class SalpakanProcessor(Processor):
 ENV_NAME = 'Salpakan-v0'
 WEIGHTS_PATH = '.models/dqn_{}_weights.h5f'.format(ENV_NAME)
 WINDOW_LENGTH = 1
-NB_STEPS = 50000
+NB_STEPS = 99999999
 MEMORY = 20000
 WARM_UP = 100
 
@@ -41,9 +41,9 @@ input_layer = Input(shape=input_shape)
 mask = Input(shape=(nb_actions,))
 
 rehsape_layer = Reshape((9, 8, 3))(input_layer)
-conv_1 = Conv2D(192, 6, activation='relu', padding='same')(rehsape_layer)
+conv_1 = Conv2D(64, 5, activation='relu', padding='same')(rehsape_layer)
 flat_layer = Flatten()(conv_1)
-dense_1 = Dense(512, activation='relu')(flat_layer)
+dense_1 = Dense(256, activation='relu')(flat_layer)
 output_layer = Dense(nb_actions)(dense_1)
 masked_layer = multiply([output_layer, mask])
 

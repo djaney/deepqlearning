@@ -1,6 +1,7 @@
 import numpy as np
 import random
 import math
+import tkinter as tk
 
 PIECE_CONF = [1, 2, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 WIDTH = 9
@@ -200,3 +201,61 @@ class SalpakanGame:
     def generate_mask(self):
         mask = [1 if (self.is_valid_move(i)) else 0 for i in range(289)]
         return np.array(mask)
+
+
+class Renderer:
+    def __init__(self):
+        self.width = 562
+        self.height = 500
+
+        self.x_tiles = 9
+        self.y_tiles = 8
+
+        self.tile_width = self.width / self.x_tiles
+        self.tile_height = self.height / self.y_tiles
+
+        self.view = None
+        self.canvas = None
+
+        self.view = tk.Tk()
+        self.view.geometry('{}x{}'.format(self.width, self.height))
+        self.view.resizable(width=False, height=False)
+        self.canvas = tk.Canvas(self.view, width=self.width, height=self.width)
+        self.canvas.pack()
+
+    def render(self, game):
+        self._clear(self.canvas)
+        self._draw_board(self.canvas)
+        self._draw_pieces(game.board)
+        self.view.update_idletasks()
+
+    def _clear(self, canvas):
+
+        # clear
+        canvas.delete("all")
+    def _draw_board(self, canvas):
+
+        # set board to white
+        canvas.create_rectangle(0, 0, self.width, self.height, fill='white')
+
+        # add lines
+        for i in range(self.x_tiles):
+            canvas.create_line(self.tile_width * i, 0, self.tile_width * i, self.height)
+        for i in range(self.y_tiles):
+            canvas.create_line(0, self.tile_height * i, self.width, self.tile_height * i)
+
+    def _draw_pieces(self, board):
+        # Draw cells
+        for x, col in enumerate(board):
+            for y, cell in enumerate(col):
+                x1 = self.tile_width * x
+                y1 = self.tile_height * y
+                x2 = self.tile_width * x + self.tile_width
+                y2 = self.tile_height * y + self.tile_height
+                # Draw pieces
+                if cell[0] != 0:
+                    self.canvas.create_rectangle(x1, y1, x2, y2, fill='red' if cell[0] > 0 else 'black')
+                    self.canvas.create_text(x1 + (x2 - x1) / 2, y1 + (y2 - y1) / 2,
+                                            fill='white',
+                                            font="Times 20 bold",
+                                            text=str(cell[0]))
