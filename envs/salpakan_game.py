@@ -207,8 +207,8 @@ class SalpakanGame:
 
 class Renderer:
     def __init__(self):
-        self.width = 532
-        self.height = 500
+        self.width = 281
+        self.height = 250
 
         self.x_tiles = 9
         self.y_tiles = 8
@@ -278,7 +278,7 @@ class Renderer:
                     canvas.create_rectangle(x1, y1, x2, y2, fill='red' if cell[CHANNEL_TROOPS] > 0 else 'black')
                     canvas.create_text(x1 + (x2 - x1) / 2, y1 + (y2 - y1) / 2,
                                        fill='white',
-                                       font="Arial 20 bold",
+                                       font="Arial 10 bold",
                                        text=str(int(cell[0])))
 
     def _draw_perception(self, canvas, board):
