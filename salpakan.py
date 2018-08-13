@@ -41,7 +41,7 @@ input_layer = Input(shape=input_shape)
 mask = Input(shape=(nb_actions,))
 
 rehsape_layer = Reshape((9, 8, 3))(input_layer)
-conv_1 = Conv2D(64, 5, activation='relu', padding='same')(rehsape_layer)
+conv_1 = Conv2D(64, 3, activation='relu', padding='same')(rehsape_layer)
 flat_layer = Flatten()(conv_1)
 dense_1 = Dense(256, activation='relu')(flat_layer)
 output_layer = Dense(nb_actions)(dense_1)
