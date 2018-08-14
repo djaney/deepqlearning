@@ -301,7 +301,7 @@ class Renderer:
                 canvas.create_text(x1 + (x2 - x1) / 2, y1 + (y2 - y1) / 2,
                                    fill='red',
                                    font=self.font,
-                                   text='{}'.format(255-value))
+                                   text='{:.0f}'.format((255-value)/255*100))
 
     def _draw_spy_perception(self, canvas, board):
         # Draw cells
@@ -319,4 +319,4 @@ class Renderer:
                 canvas.create_text(x1 + (x2 - x1) / 2, y1 + (y2 - y1) / 2,
                                    fill='red',
                                    font=self.font,
-                                   text='{}'.format(255 - value))
+                                   text='{:.0f}'.format((255-value)/255*100))
