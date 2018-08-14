@@ -92,6 +92,7 @@ class SalpakanGame:
                     if self.board[x][y][CHANNEL_TROOPS] == 0:
                         # set troops, negative if player 2
                         self.board[x][y][CHANNEL_TROOPS] = i + 1 if player == PLAYER_1 else (i + 1) * -1
+                        self.board[x][y][CHANNEL_PERCEPTION] = 1
                         break
 
     def move(self, move):
@@ -207,6 +208,9 @@ class SalpakanGame:
 
 class Renderer:
     def __init__(self):
+
+        self.font = "Arial 10 bold"
+
         self.width = 281
         self.height = 250
 
@@ -278,7 +282,7 @@ class Renderer:
                     canvas.create_rectangle(x1, y1, x2, y2, fill='red' if cell[CHANNEL_TROOPS] > 0 else 'black')
                     canvas.create_text(x1 + (x2 - x1) / 2, y1 + (y2 - y1) / 2,
                                        fill='white',
-                                       font="Arial 10 bold",
+                                       font=self.font,
                                        text=str(int(cell[0])))
 
     def _draw_perception(self, canvas, board):
@@ -294,6 +298,10 @@ class Renderer:
                 value = 255 - math.floor(value * 255)
                 hex_value = value.to_bytes(1, 'big').hex()
                 canvas.create_rectangle(x1, y1, x2, y2, fill='#{0}{0}{0}'.format(hex_value))
+                canvas.create_text(x1 + (x2 - x1) / 2, y1 + (y2 - y1) / 2,
+                                   fill='red',
+                                   font=self.font,
+                                   text='{}'.format(255-value))
 
     def _draw_spy_perception(self, canvas, board):
         # Draw cells
@@ -308,3 +316,7 @@ class Renderer:
                 value = 255 - math.floor(value * 255)
                 hex_value = value.to_bytes(1, 'big').hex()
                 canvas.create_rectangle(x1, y1, x2, y2, fill='#{0}{0}{0}'.format(hex_value))
+                canvas.create_text(x1 + (x2 - x1) / 2, y1 + (y2 - y1) / 2,
+                                   fill='red',
+                                   font=self.font,
+                                   text='{}'.format(255 - value))
