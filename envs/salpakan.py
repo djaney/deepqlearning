@@ -1,9 +1,10 @@
 from gym import Env, spaces
 import numpy as np
-from .salpakan_game import SalpakanGame, Renderer
+from .salpakan_game import SalpakanGame, Renderer, \
+    MOVE_NORMAL, MOVE_CAPTURE, MOVE_CAPTURE_LOSE, MOVE_WIN, MOVE_PASS, MOVE_INVALID
 
 OBSERVATION_SHAPE = (9, 8, 3)
-MAX_STEPS = 1000
+MAX_STEPS = 200
 
 
 class SalpakanEnv(Env):
@@ -19,10 +20,24 @@ class SalpakanEnv(Env):
         self.renderer = Renderer()
 
     def step(self, action):
-        reward = self.game.move(action)
+        move_type = self.game.move(action)
         ob = self._get_state()
-        done = self.game.winner is not None or self.steps >= MAX_STEPS
+        done = self.game.winner is not None or self.steps > MAX_STEPS
         self.steps += 1
+
+        if move_type == MOVE_NORMAL:
+            reward = 1
+        elif move_type == MOVE_CAPTURE:
+            reward = 3
+        elif move_type == MOVE_CAPTURE_LOSE:
+            reward = -3
+        elif move_type == MOVE_WIN:
+            reward = 10
+        elif move_type == MOVE_PASS:
+            reward = 0
+        elif move_type == MOVE_INVALID:
+            reward = -10
+
         return ob, reward, done, {}
 
     def reset(self):
