@@ -4,7 +4,7 @@ import gym
 import sys
 import os
 from keras.models import Model
-from keras.layers import Dense, Flatten, Conv2D, Reshape, multiply, Input
+from keras.layers import Dense, Flatten, Conv2D, Reshape, multiply, Input, LeakyReLU
 from keras.optimizers import Adam
 
 from rl.agents.dqn import DQNAgent
@@ -39,10 +39,12 @@ input_layer = Input(shape=input_shape)
 mask = Input(shape=(nb_actions,))
 
 rehsape_layer = Reshape((9, 8, 3))(input_layer)
-conv_1 = Conv2D(64, 3, activation='relu', padding='same')(rehsape_layer)
-flat_layer = Flatten()(conv_1)
-dense_1 = Dense(512, activation='relu')(flat_layer)
-output_layer = Dense(nb_actions)(dense_1)
+conv_1 = Conv2D(64, 3, padding='same')(rehsape_layer)
+conv1_a = LeakyReLU()(conv_1)
+flat_layer = Flatten()(conv1_a)
+dense_1 = Dense(512)(flat_layer)
+dense_1_a = LeakyReLU()(dense_1)
+output_layer = Dense(nb_actions, activation='linear')(dense_1_a)
 masked_layer = multiply([output_layer, mask])
 
 model = Model([input_layer, mask], masked_layer)
