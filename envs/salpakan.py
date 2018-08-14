@@ -37,6 +37,8 @@ class SalpakanEnv(Env):
             reward = 0
         elif move_type == MOVE_INVALID:
             reward = -10
+        else:
+            reward = 0
 
         return ob, reward, done, {}
 
