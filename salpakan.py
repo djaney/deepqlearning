@@ -31,8 +31,6 @@ WARM_UP = 100
 
 # Get the environment and extract the number of actions.
 env = gym.make(ENV_NAME)
-np.random.seed(123)
-env.seed(123)
 nb_actions = env.action_space.n
 
 # Next, we build a very simple model.
@@ -43,7 +41,7 @@ mask = Input(shape=(nb_actions,))
 rehsape_layer = Reshape((9, 8, 3))(input_layer)
 conv_1 = Conv2D(64, 3, activation='relu', padding='same')(rehsape_layer)
 flat_layer = Flatten()(conv_1)
-dense_1 = Dense(256, activation='relu')(flat_layer)
+dense_1 = Dense(512, activation='relu')(flat_layer)
 output_layer = Dense(nb_actions)(dense_1)
 masked_layer = multiply([output_layer, mask])
 
