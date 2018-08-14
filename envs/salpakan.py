@@ -18,11 +18,13 @@ class SalpakanEnv(Env):
         self.canvas = None
         self.steps = 0
         self.renderer = Renderer()
+        self.done = False
 
     def step(self, action):
         move_type = self.game.move(action)
         ob = self._get_state()
         done = self.game.winner is not None or self.steps > MAX_STEPS
+        self.done = self.done or done
         self.steps += 1
 
         if move_type == MOVE_NORMAL:
@@ -37,12 +39,14 @@ class SalpakanEnv(Env):
             reward = 0
         elif move_type == MOVE_INVALID:
             reward = -10
+            self.done = self.done or True
         else:
             reward = 0
 
-        return ob, reward, done, {}
+        return ob, reward, self.done, {}
 
     def reset(self):
+        self.done = False
         self.steps = 0
         self.game = SalpakanGame()
         return self._get_state()
